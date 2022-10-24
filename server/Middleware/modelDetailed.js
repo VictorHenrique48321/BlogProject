@@ -1,7 +1,6 @@
 const { default: axios } = require("axios")
 const postDetails = require("./postDetails")
 
-
 const modelDetailed = async (model, modelName) => {
 
   let details = null
@@ -37,6 +36,8 @@ const modelDetailed = async (model, modelName) => {
 
   for(let i = 0; i < model.length; i++) {
 
+    console.log(details[i])
+
     const postInfo = {
       id: details[i].id,
       title: details[i].title,
@@ -44,6 +45,7 @@ const modelDetailed = async (model, modelName) => {
       creatorName: details[i].creatorName,
       name: details[i].name,
       likes: details[i].likes,
+      comment: details[i].comment,
       profilePicture: details[i].profilePicture
     }
 

@@ -1,6 +1,6 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material"
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import formValidation, { formObject } from "../helpers/useFormValidation"
 
 const Register = () => {

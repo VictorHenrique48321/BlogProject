@@ -6,7 +6,7 @@ const userInfo = require("../Middleware/userInfo")
 
 // Models
 const Comment = require("../Models/Comment")
-
+const Post = require("../Models/Post")
 
 class CommentController {
 
@@ -25,6 +25,11 @@ class CommentController {
     // Validations
     if(!postId) return res.status(422).json({ msg: "Missing post id"})
     if(!comment) return res.status(422).json({ msg: "Missing comment"})
+
+    // Incrementing post comment column
+    const post = await Post.findByIdAndUpdate(postId, { $inc: {"comment": 1 }})
+
+    if(!post) return res.status(404).json({ msg: "Post not found"})
 
     const Newcomment = new Comment ({
       comment: comment,

@@ -1,7 +1,6 @@
 import { Box, Typography, Button } from "@mui/material"
 import axios from "axios"
-import { useContext, useEffect, useState } from "react"
-import { AuthContext } from "../context/authenticateProvider"
+import { useEffect, useState } from "react"
 
 export interface recentPosts {
   createdAt: string,
@@ -15,9 +14,6 @@ export interface recentPosts {
 const Home = () => {
 
   const [recentPosts, setRecentPosts] = useState<recentPosts[]>([])
-
-  const [authState, setAuthState] = useContext(AuthContext)
-
 
   const shorterText = (text: string) => {
     

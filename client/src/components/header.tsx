@@ -28,7 +28,7 @@ const Header = () => {
     }
   })
   
-  const [authState, setAuthState] = useContext(AuthContext)
+  const [authState] = useContext(AuthContext)
 
   const testeStyle = {
     backgroundColor: "#343a40",
@@ -58,7 +58,7 @@ const Header = () => {
     if(authState) {
       setHeaderValues({
         links: {
-          firstLink: "/profile",
+          firstLink: `/${authState.username}`,
           secondLink: "/logout"
         },
         text: {

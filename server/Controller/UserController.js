@@ -3,12 +3,10 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const Post = require("../Models/Post")
 const sharp = require("sharp")
-const path = require("path")
-const fs = require("fs")
 
 // Middlewares
-const resizeImage = require("../Middleware/resizeImage")
 const userInfo = require("../Middleware/userInfo")
+const modelDetailed = require("../Middleware/modelDetailed")
 
 // Sharp config
 sharp.cache(false)
@@ -17,19 +15,11 @@ sharp.cache(false)
 const User = require("../Models/User")
 const Likes = require("../Models/Likes")
 const Comments = require("../Models/Comment")
-const postDetails = require("../Middleware/postDetails")
-const modelDetailed = require("../Middleware/modelDetailed")
 
 
 class UserController {
 
-  static async publicRoute (req, res) {
-
-    return res.status(200).json({ msg: "Rota funcionando"})
-
-  }
-
-  static async privateRoute (req, res) {
+  static async userAccounteInfo (req, res) {
 
     const username = req.params.username
 
@@ -65,8 +55,6 @@ class UserController {
   static async createUser (req, res) {
 
     const { name, username, email, password } = req.body
-
-    console.log(req.body)
 
     // Validations
     if(!name) return res.status(422).json({ msg: "Name is required"})
@@ -161,6 +149,7 @@ class UserController {
         msg: "Autenticado com sucesso",
         user: {
           name: user.name,
+          username: user.username,
           email: user.email,
           profilePicture: user.profilePicture
         }
@@ -209,6 +198,29 @@ class UserController {
       console.log(error)
 
       return res.status(500).json({msg: "Server internal error"})
+    }
+  }
+
+  static async updateProfilePicture (req, res) {
+
+    const secret = process.env.SECRET
+    const accessToken = req.cookies["access-token"]
+    const userID = jwt.verify(accessToken, secret)
+
+    // Field to update
+    const update = {profilePicture: `/userAvatar/${req.file.filename}`}
+
+    try {
+
+      // Update user profile picture
+      await User.findByIdAndUpdate(userID.id, update).catch((err) => console.log(err))
+
+      return res.status(200).json({ msg: "Ola"})
+
+    } catch {
+
+      return res.status(500).json({ msg: "Deu merda"})
+
     }
   }
 }

@@ -1,9 +1,14 @@
-import { Avatar, Box, Typography } from "@mui/material"
 import axios from "axios"
 import moment from "moment"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
-import { AuthContext } from "../../context/authenticateProvider"
+
+// Material UI
+import { Avatar, Box, Typography } from "@mui/material"
+
+// Icons
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import CommentIcon from '@mui/icons-material/Comment'
 
 type postInformation = {
   id: string,
@@ -12,6 +17,7 @@ type postInformation = {
   creatorName: string,
   name: string,
   likes: string,
+  comment: string,
   profilePicture: string
 }
 
@@ -83,7 +89,6 @@ const Profile = () => {
     margin: "0 auto",
     backgroundColor: "#181a1b",
   }
-
   const userInfoStyle = {
     width: "100%",
     height: "200px",
@@ -92,19 +97,16 @@ const Profile = () => {
     justifyContent: "center",
     alignItems: "center"
   }
-
   const userStyle = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
   }
-
   const categorysStyle = {
     display: "flex",
     justifyContent: "space-evenly",
     margin: "10px 0"
   }
-
   const userInfo = {
     display: "flex",
     flexDirection: "column",
@@ -113,39 +115,33 @@ const Profile = () => {
   }
 
   useEffect(() => {
-
     const userProfile = () => {
-
       const URL = `http://localhost:5000/userInfo/${params.username}`
-
       axios({
         method: "get",
         url: URL,
         withCredentials: true,
       }).then((response) => {
-        
         const user: profileUser = response.data.user
-
         setProfileUser(user)
-
       }).catch((response) => {
         console.log(response)
       })
     }
     userProfile()
-  })
+  }, [params.username])
 
   return (
     <Box sx={containerStyle}>
       <Box sx={userInfoStyle}>
         <Box sx={userStyle}>
-          <Box sx={{padding: "10px"}}>
+          <Box>
             <Avatar alt={profileUser?.username} src={`http://localhost:5000${profileUser?.profilePicture}`}/>
           </Box>
           <Box sx={userInfo}>
             <Typography sx={{color: "#d9d6d2"}}>{profileUser?.name}</Typography>
             <Typography sx={{color: "#a59e94"}}>@{profileUser?.username}</Typography>
-        </Box>
+          </Box>
         </Box>
       </Box>
       <Box>
@@ -198,7 +194,11 @@ const ProfileInfo = ({ showInfo }: props) => {
   const userComments = () => {
 
     const userComments = userInfo?.comments
+    console.log(userComments)
 
+    const boxStyle = {
+      paddingLeft: "30px"
+    }
     const containerStyle = {
       padding: "20px",
       paddingLeft: "50px",
@@ -223,7 +223,7 @@ const ProfileInfo = ({ showInfo }: props) => {
             <Box>
               {postsLayout(value.postInformation)}
             </Box>
-            <Box>
+            <Box sx={boxStyle}>
               <Box sx={containerStyle}>
                 <Box sx={userContainer}>
                   <Avatar alt={value.comment.userInfo.username} src={`http://localhost:5000${value.comment.userInfo.profilePicture}`}/>
@@ -276,7 +276,15 @@ const ProfileInfo = ({ showInfo }: props) => {
     const postContainer = {
       padding: "0 2rem",
     }
-
+    const postUserInterface = {
+      display: "flex",
+      justifyContent: "space-evenly",
+      marginTop: "30px"
+    }
+    const userSection = {
+      display: "inline-flex",
+      alignItems: "center"
+    }
 
     return (
       <Box sx={{borderTop: "1px solid #6e6a65"}}>
@@ -289,10 +297,19 @@ const ProfileInfo = ({ showInfo }: props) => {
             </Box>
             <Box sx={postInfoContainer}>
               <Typography variant="h5">{postDetails.title}</Typography>
-              <Typography> Favorites {postDetails.likes}</Typography>
             </Box>
             <Box>
               <Typography>{postDetails.postText}</Typography>
+            </Box>
+            <Box sx={postUserInterface}>
+              <Box sx={userSection}>
+                <CommentIcon sx={{cursor: "pointer", marginRight: "5px"}}/>
+                <span>{postDetails.comment}</span>
+              </Box>
+              <Box sx={userSection}>
+                <FavoriteIcon sx={{cursor: "pointer", marginRight: "5px", color: "white"}}/>
+                <span>{postDetails.likes}</span>
+              </Box>
             </Box>
           </Box>
         </Box>
@@ -317,7 +334,7 @@ const ProfileInfo = ({ showInfo }: props) => {
       })
     }
     getUserData()
-  }, [])
+  }, [params.username])
 
   return (
     <Box>

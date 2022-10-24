@@ -5,6 +5,7 @@ const Post = mongoose.model("Post", {
   postText: String,
   createdAt: Date,
   likes: {type: Number, default: 0},
+  comment: {type: Number, default: 0},
   creatorName: String,
   userId: String
 })

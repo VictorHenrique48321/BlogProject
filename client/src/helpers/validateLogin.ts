@@ -5,6 +5,7 @@ export interface loginResponse {
   message: string
   user: {
     name: string,
+    username: string,
     email: string,
     profilePicture: string
   }

@@ -1,9 +1,12 @@
 import { Box, Button, Grid, TextField, Typography } from "@mui/material"
 import { useContext, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { AuthContext } from "../context/authenticateProvider"
-import validateLogin, { loginResponse } from "../helpers/validateLogin"
+import validateLogin from "../helpers/validateLogin"
 
 const Login = () => {
+
+  const navigate = useNavigate()
 
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
@@ -19,11 +22,14 @@ const Login = () => {
       return setLoginError(response)
     }
 
-    return setAuthState({
+    setAuthState({
       name: response.user.name,
+      username: response.user.username,
       email: response.user.email,
       profilePicture: response.user.profilePicture
     })
+
+    navigate(`/${authState.username}`)
   }
 
   const containerStyle = {

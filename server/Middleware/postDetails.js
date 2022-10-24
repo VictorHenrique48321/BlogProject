@@ -15,6 +15,7 @@ const postDetails = async (postsId) => {
         title: data.data.postDetails.post.title,
         postText: data.data.postDetails.post.postText,
         likes: data.data.postDetails.post.likes,
+        comment: data.data.postDetails.post.comment,
         name: data.data.postDetails.user.name,
         creatorName: data.data.postDetails.user.username,
         profilePicture: data.data.postDetails.user.profilePicture

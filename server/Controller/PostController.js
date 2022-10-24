@@ -107,7 +107,7 @@ class PostController {
 
   static async likePost (req, res) {
 
-    const id = req.params.id
+    const postId = req.params.postId
 
     //Get user info
     const secret = process.env.SECRET
@@ -116,13 +116,13 @@ class PostController {
     const userId = jwt.verify(accessToken, secret)
 
     // If post exists increment like by 1
-    const post = await Post.findByIdAndUpdate(id, { $inc: {"likes": 1 }})
+    const post = await Post.findByIdAndUpdate(postId, { $inc: {"likes": 1 }})
 
     if(!post) return res.status(404).json({ msg: "Post not found"})
 
     const likes = new Likes({
       userId: userId.id,
-      postId: id
+      postId: postId
     })
 
     try {
