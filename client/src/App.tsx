@@ -6,6 +6,7 @@ import Login from './pages/login';
 import PrivateRoute from './pages/private';
 import { AuthProvider } from './context/authenticateProvider';
 import Profile from './pages/profile/profile';
+import PostUser from './pages/profile/postUser/postUser';
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/login" element={<Login/>}/>
           <Route path="/private" element={<PrivateRoute/>}/>
           <Route path="/:username" element={<Profile/>}/>
+          <Route path="/:username/post/:postID" element={<PostUser/>}/>
         </Routes>
       </AuthProvider>
     </>
