@@ -16,6 +16,9 @@ router.get("/user/:username", userController.userAccounteInfo)
 // User Info
 router.get("/userinfo/:username", userController.userInfo)
 
+// Search Users
+router.get("/users/:username", userController.searchUser)
+
 // Login User
 router.post("/auth/login", userController.loginUser)
 

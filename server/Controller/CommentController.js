@@ -34,7 +34,7 @@ class CommentController {
     const Newcomment = new Comment ({
       comment: comment,
       createdAt: new Date(),
-      creatorName: user.name,
+      creatorName: user.username,
       userId: userId.id,
       postId: postId
     })

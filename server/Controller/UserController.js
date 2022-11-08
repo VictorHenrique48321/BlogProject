@@ -1,12 +1,15 @@
 // Imports
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
-const Post = require("../Models/Post")
 const sharp = require("sharp")
+const fs = require("fs")
 
 // Middlewares
 const userInfo = require("../Middleware/userInfo")
 const modelDetailed = require("../Middleware/modelDetailed")
+
+// Helpers
+const resizeImage = require("../helper/resizeImage")
 
 // Sharp config
 sharp.cache(false)
@@ -15,7 +18,7 @@ sharp.cache(false)
 const User = require("../Models/User")
 const Likes = require("../Models/Likes")
 const Comments = require("../Models/Comment")
-
+const Post = require("../Models/Post")
 
 class UserController {
 
@@ -27,13 +30,13 @@ class UserController {
     const user = await User.findOne({'username': {'$regex': `^${username}$`, $options: 'i'}}, "name email profilePicture username").catch((error) => console.log(error))
 
     // Search if user has any posts
-    const post = await Post.find({userId: user.id}, "_id title postText likes creatorName")
+    const post = await Post.find({userId: user.id}, "_id title postText likes creatorName").sort({createdAt: -1})
 
     // Seach if user has any comments
-    const comments = await Comments.find({userId: user.id}, "_id postId comment createdAt userId creatorName")
+    const comments = await Comments.find({userId: user.id}, "_id postId comment createdAt userId creatorName").sort({createdAt: -1})
     
     // Search if user has any likes
-    const likes = await Likes.find({userId: user.id}, "postId")
+    const likes = await Likes.find({userId: user.id}, "postId").sort({createdAt: -1})
     
     if(!user) {
       return res.status(404).json({ msg: "Usuario nao encontrado"})
@@ -181,6 +184,25 @@ class UserController {
     }
   }
 
+  static async searchUser (req ,res) {
+
+    const username = req.params.username
+
+    // Search user in DB
+    const user = await User.find({"username": {$regex: '^' + username, $options: "i"}}, "-_id -email -password -__v")
+
+    try {
+
+      return res.status(200).json(user)
+
+    } catch(err) {
+
+      console.log(err)
+
+      return res.status(500).json()
+    }
+  }
+
   static async userInfo (req, res) {
 
     const username = req.params.username
@@ -207,7 +229,10 @@ class UserController {
     const accessToken = req.cookies["access-token"]
     const userID = jwt.verify(accessToken, secret)
 
-    // Field to update
+    // Resize Image
+    resizeImage("UserAvatar/victor.png").catch((err) => console.log(err))
+
+    // Update user profile picture on the DB
     const update = {profilePicture: `/userAvatar/${req.file.filename}`}
 
     try {

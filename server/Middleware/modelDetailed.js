@@ -36,8 +36,6 @@ const modelDetailed = async (model, modelName) => {
 
   for(let i = 0; i < model.length; i++) {
 
-    console.log(details[i])
-
     const postInfo = {
       id: details[i].id,
       title: details[i].title,

@@ -16,8 +16,17 @@ router.post("/createpost", checkToken, postController.createPost)
 // Post Route
 router.get("/post/:id", postController.postDetails)
 
+// Show post on comment
+router.get("/post/comment/:id", postController.postOnComment)
+
+// Post Details User
+router.get("/post/user/:id", postController.postDetailsUser)
+
 // Like Post
-router.get("/post/:postId/like", checkToken, checkUserLike, postController.likePost)
+router.post("/post/:postId/like", checkToken, checkUserLike, postController.likePost)
+
+// Check User Like
+router.get("/post/:postId/like", checkToken, postController.checkUserLike)
 
 // Update Post
 router.put("/post/:id/update", checkToken, postController.updatePost)

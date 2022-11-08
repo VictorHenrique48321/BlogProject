@@ -10,6 +10,7 @@ const Post = require("../Models/Post")
 const Comment = require("../Models/Comment")
 const Likes = require("../Models/Likes")
 const User = require("../Models/User")
+const SearchUser = require("../helper/searchUser")
 
 class PostController {
 
@@ -105,13 +106,90 @@ class PostController {
 
   }
 
+  static async postOnComment (req, res) {
+
+    const postID = req.params.id
+
+    // Check if post exists
+    const post = await Post.findById(postID, "-_id -userId -__v -comment -createdAt -likes -creatorName")
+
+    if(!post) return res.status(200).json("post not found")
+
+    // Get user info
+    const secret = process.env.SECRET
+    const accessToken = req.cookies["access-token"]
+    const userId = jwt.verify(accessToken, secret).id
+
+    const user = await User.findById(userId, "-password -__v -_id -email")
+
+    const postDetails = {
+      name: user.name,
+      username: user.username,
+      profilePicture: user.profilePicture,
+      title: post.title,
+      postText: post.postText,
+
+    }
+
+    return res.status(200).json(postDetails)
+
+  }
+
+  static async postDetailsUser (req, res) {
+
+    const postID = req.params.id
+
+    // Check if post exists
+    const post = await Post.findById(postID, "-__v -_id -creatorName -createdAt")
+
+    if(!post) return res.status(404).json("post not found")
+
+    // Search post comments
+    const comments = await Comment.find({"postId": postID}, "-postId -__v -_id -creatorName")
+    // user info from comments
+    const userInfo = await SearchUser(comments)
+
+    // merge comments and users
+    const postComments = []
+    
+    comments.map((value, index) => {
+      if(value.userId === userInfo[index].id) {
+        postComments.push({
+          username: userInfo[index].username,
+          name: userInfo[index].name,
+          picture: userInfo[index].profilePicture,
+          ...value.toJSON()
+        })
+      }
+    })
+
+    // merge post and user
+    const userPost = await User.findById(post.userId, "-_id -email -password -__v")
+    
+    const postDetails = {
+      ...post.toJSON(),
+      ...userPost.toJSON()
+    }
+
+    try {
+
+      return res.status(200).json({postComments, postDetails})
+    
+    } catch(err) {
+
+      console.log(err)
+
+      return res.status(500).json("server error")
+
+    }
+  }
+
   static async likePost (req, res) {
 
     const postId = req.params.postId
 
     //Get user info
     const secret = process.env.SECRET
-
     const accessToken = req.cookies["access-token"]
     const userId = jwt.verify(accessToken, secret)
 
@@ -122,14 +200,15 @@ class PostController {
 
     const likes = new Likes({
       userId: userId.id,
-      postId: postId
+      postId: postId,
+      createdAt: new Date()
     })
 
     try {
 
       await likes.save()
 
-      return res.status(200).json({msg: "updated"})
+      return res.status(200).json({ response: true })
 
     } catch(error) {
 
@@ -139,6 +218,32 @@ class PostController {
 
     }
 
+  }
+
+  static async checkUserLike (req, res) {
+
+    const post = req.params.postId
+
+    //Get user info
+    const secret = process.env.SECRET
+    const accessToken = req.cookies["access-token"]
+    const user = jwt.verify(accessToken, secret).id
+
+    // Check if user liked the post
+    const like = await Likes.findOne({userId: user, postId: post}).catch((err) => console.log(err))
+
+    if(!like) return res.status(200).json({like: false})
+
+    try {
+
+      return res.status(200).json({like: true})
+
+    } catch(err) {
+
+      console.log(err)
+
+      return res.status(500).json({msg: "server internal error"})
+    }
   }
 
   static async updatePost (req, res) {

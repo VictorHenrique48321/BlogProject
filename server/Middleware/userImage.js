@@ -21,11 +21,6 @@ const storage = multer.diskStorage({
     // Find username
     const user = await User.findById(userID.id, "username")
 
-    // Check if user has a profile picture
-    const check = fs.existsSync(`UserAvatar/${user.username}.png`)
-
-    console.log(check)
-
     callback(null, user.username+".png")
   }
 })

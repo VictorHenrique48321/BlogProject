@@ -1,6 +1,8 @@
-// Models
 const jwt = require("jsonwebtoken")
+
+// Models
 const Like = require("../Models/Likes")
+const Post = require("../Models/Post")
 
 const checkUserLike = async (req, res, next)  => {
 
@@ -11,14 +13,16 @@ const checkUserLike = async (req, res, next)  => {
 
   const userToken = jwt.verify(accessToken, secret)
 
-  const user = await Like.find({'userId': userToken.id, 'postId': postId})
+  const user = await Like.deleteOne({'userId': userToken.id, 'postId': postId})
 
-  if(user.length === 0) {
+  if(user.deletedCount === 0) {
     next()
     return
   }
 
-  return res.status(422).json({msg: "User already liked the post"})
+  await Post.findByIdAndUpdate(postId, {$inc: {"likes": -1}})
+
+  return res.status(200).json({ response: false })
 }
 
 module.exports = checkUserLike

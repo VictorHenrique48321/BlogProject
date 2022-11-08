@@ -9,7 +9,6 @@ const resizeImage = async (path) => {
       fit: "inside"
     })
     .toBuffer()
-
   return sharp(buffer).toFile(path)
 }
 
